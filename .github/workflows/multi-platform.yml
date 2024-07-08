@@ -35,6 +35,7 @@ jobs:
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
+          bindings: QD-Studio/geode-bindings
           combine: true
           target: ${{ matrix.config.target }}
 
