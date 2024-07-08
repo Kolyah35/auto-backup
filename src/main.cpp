@@ -36,7 +36,7 @@ class $modify(MenuLayer) {
     bool init() {
         auto ret = MenuLayer::init();
 
-        if(shouldSync) {
+        if(shouldSync && GJAccountManager::sharedState()->m_accountID != 0) {
             shouldSync = false;
             fromMyMod = true;
 
