@@ -15,14 +15,6 @@ bool saving = false;
 bool shouldSync = true;
 Notification* notification;
 
-const char* getURL() {
-    uint32_t offset = 0;
-    memcpy((void*)&offset, (void*)(base::get() + 0x7DD4B + 3), 4);
-    const char* str = (const char*)(base::get() + 0x7DD52 + offset);
-
-    return str;
-}
-
 class $modify(MenuLayer) {
     void FLAlert_Clicked(FLAlertLayer* alert, bool b) {
         if(b && alert->getTag() == 0 && GJAccountManager::sharedState()->m_accountID != 0){
@@ -33,10 +25,7 @@ class $modify(MenuLayer) {
             notification = Notification::create("Saving account... Press close button or ESC key to cancel.", NotificationIcon::Loading, 0);
             notification->show();
 
-            std::string url = getURL();
-            url.replace(url.begin() + url.find_last_of('/'), url.end(), "/backupGJAccountNew.php");
-
-            GJAccountManager::sharedState()->backupAccount(url);
+            GJAccountManager::sharedState()->getAccountBackupURL();
             
             return;
         }
@@ -54,10 +43,7 @@ class $modify(MenuLayer) {
             notification = Notification::create("Syncing account...", NotificationIcon::Loading, 0);
             notification->show();
             
-            std::string url = getURL();
-            url.replace(url.begin() + url.find_last_of('/'), url.end(), "/syncGJAccountNew.php");
-
-            GJAccountManager::sharedState()->syncAccount(url);
+            GJAccountManager::sharedState()->getAccountSyncURL();
         }
 
         return ret;
@@ -75,15 +61,12 @@ class $modify(MenuLayer) {
 class $modify(GJAccountManager) {
     void onProcessHttpRequestCompleted(cocos2d::extension::CCHttpClient* client, cocos2d::extension::CCHttpResponse* response) {
         if(fromMyMod && this->m_activeDownloads->objectForKey("bak_account")){
-            if(response->isSucceed()){
-                notification->setIcon(NotificationIcon::Success);
-                notification->setString("Backup successful.");
-            } else {
-                notification->setIcon(NotificationIcon::Error);
-                notification->setString("Backup failed!");
-            }
+            this->m_activeDownloads->removeObjectForKey("bak_account");
 
+            notification->setIcon(response->isSucceed() ? NotificationIcon::Success : NotificationIcon::Error);
+            notification->setString(response->isSucceed() ? "Backup successful." : "Backup failed!");
             notification->setTime(1.0f);
+            
             fromMyMod = false;
             saving = false;
 
@@ -99,17 +82,13 @@ class $modify(GJAccountManager) {
         }
         
         if(fromMyMod && this->m_activeDownloads->objectForKey("sync_account")) {
-            if(response->isSucceed()){
-                notification->setIcon(NotificationIcon::Success);
-                notification->setString("Saved data has been downloaded.");
-            } else {
-                notification->setIcon(NotificationIcon::Error);
-                notification->setString("Sync failed!");
-            }
+            this->m_activeDownloads->removeObjectForKey("sync_account");
 
+            notification->setIcon(response->isSucceed() ? NotificationIcon::Success : NotificationIcon::Error);
+            notification->setString(response->isSucceed() ? "Saved data has been downloaded." : "Sync failed!");
             notification->setTime(1.0f);
-            fromMyMod = false;
 
+            fromMyMod = false;
             return;
         }
 
