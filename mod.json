@@ -1,11 +1,17 @@
 {
 	"geode": "3.2.0",
 	"gd": {
-		"win": "2.206"
+		"win": "2.206",
+		"android": "2.206"
 	},
 	"version": "v1.0.0",
 	"id": "kolyah35.autobackup",
 	"name": "AutoBackup",
-	"developer": "Kolyah35",
-	"description": "Auto backup and sync."
+	"developers": ["Kolyah35", "Jaan"],
+	"description": "Auto backup and sync.",
+	"repository": "https://github.com/Kolyah35/auto-backup.git",
+	"issues": {
+		"info": "github",
+		"url": "https://github.com/Kolyah35/auto-backup/issues"
+	}
 }
